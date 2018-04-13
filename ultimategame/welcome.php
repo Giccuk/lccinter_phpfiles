@@ -41,6 +41,7 @@
       $subject=$defaultstate["0"]["path"];
       $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
       preg_match($pattern,$subject,$matches);
+
       if ($matches[1]=="{$defaultinst}"){//server is ready
           /*
           $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);//create first agent 
