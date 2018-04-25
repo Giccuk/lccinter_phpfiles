@@ -8,25 +8,25 @@
 
   include "../trucontrol/trustgameinfo.php";
   if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);//create first agent 
+    $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$botid,$firstagent_role);//create first agent 
     $interactionid_trusteeside=GetInteractionId($firstagent_state,$lccengineaddress,$institutionname);
     if ($interactionid_trusteeside!=""){//firstagent has been created successfully
       $interactionpath="http://{$lccengineaddress}/interaction/user/manager/{$institutionname}/{$interactionid_trusteeside}";
-      CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_trusteeside,$secondagent_id,$secondagent_role);//create second agent
+      CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_trusteeside,$playerid,$secondagent_role);//create second agent
       sleep(1);
       $allagentsstates_json=getrequest($interactionpath);
       $allagentsstates=json_decode($allagentsstates_json,true);
       
       if (count($allagentsstates["agents"])==2){//all two agents have been created successfully
-        //$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_Trusteeside,$firstagent_id);
+        //$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_Trusteeside,$botid);
         $investoroffer_now=$investoroffer;
         $trusteegetNum=$game_rate*$investoroffer_now;
-        $firstagent_response_1="e(invest({$investoroffer_now}, {$secondagent_id}), _)";  
-        AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_trusteeside,$firstagent_id,$firstagent_response_1);
+        $firstagent_response_1="e(invest({$investoroffer_now}, {$playerid}), _)";  
+        AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_trusteeside,$botid,$firstagent_response_1);
         sleep(1);  
         
-        msgstorecsv("{$interactionid_trusteeside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(invest({$investoroffer_now}#{$secondagent_id}))","{$sourcefiledir}/gamemsgs.csv");
-        mysql_insertmsgdata("{$interactionid_trusteeside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(invest({$investoroffer_now}#{$secondagent_id}))");
+        csv_storegamemsg("{$interactionid_trusteeside}","{$gameprotocol_id}","{$botid}","{$firstagent_role}","{$playerid}","{$secondagent_role}","e(invest({$investoroffer_now}#{$playerid}))","{$sourcefiledir}/gamemsgs.csv");
+        mysql_insertmsgdata("{$interactionid_trusteeside}","{$gameprotocol_id}","{$botid}","{$firstagent_role}","{$playerid}","{$secondagent_role}","e(invest({$investoroffer_now}#{$playerid}))");
                            
       }
       else{
@@ -49,19 +49,19 @@
        
         $finalrepay=$trusteechoice_now;
 
-        $secondagent_response_1="e(repay({$finalrepay}, {$firstagent_id}), _)";
-        AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_trusteeside,$secondagent_id,$secondagent_response_1);
+        $secondagent_response_1="e(repay({$finalrepay}, {$botid}), _)";
+        AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_trusteeside,$playerid,$secondagent_response_1);
         sleep(1);
       
-        msgstorecsv("{$interactionid_trusteeside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(repay({$finalrepay}#{$firstagent_id}))","{$sourcefiledir}/gamemsgs.csv");
-        mysql_insertmsgdata("{$interactionid_trusteeside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(repay({$finalrepay}#{$firstagent_id}))");
+        csv_storegamemsg("{$interactionid_trusteeside}","{$gameprotocol_id}","{$playerid}","{$secondagent_role}","{$botid}","{$firstagent_role}","e(repay({$finalrepay}#{$botid}))","{$sourcefiledir}/gamemsgs.csv");
+        mysql_insertmsgdata("{$interactionid_trusteeside}","{$gameprotocol_id}","{$playerid}","{$secondagent_role}","{$botid}","{$firstagent_role}","e(repay({$finalrepay}#{$botid}))");
 
         //store player info
         $playerinfo_pid=$playerid;
         $playerinfo_prole=$secondagent_role;
         $playerinfo_interid=$interactionid_trusteeside;
         $playerinfo_filedir="{$sourcefiledir}/playerinfo.csv";
-        store_playerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
+        csv_storeplayerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
         mysql_insertplayerinfodata("{$playerinfo_interid}","{$playerinfo_pid}","{$playerinfo_prole}");
 
         $finalrepay_int=intval($finalrepay);

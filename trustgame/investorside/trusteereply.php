@@ -14,14 +14,14 @@
     if (isset($_POST["investoroffer"])&&!empty($_POST["investoroffer"])){
 
         /*-----------2. Create first agent--------------------*/
-        $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);
+        $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$botid,$firstagent_role);
         $interactionid_investorside=GetInteractionId($firstagent_state,$lccengineaddress,$institutionname); 
 
         if ($interactionid_investorside!=""){
           /*---------2.2 check firstagent state---------------*/
           $interactionpath="http://{$lccengineaddress}/interaction/user/manager/{$institutionname}/{$interactionid_investorside}";
           /*----------3. create second agent----------------*/
-          CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_investorside,$secondagent_id,$secondagent_role);
+          CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_investorside,$playerid,$secondagent_role);
           sleep(1);
           /*------------3.1 check if all agents are created ---------------*/
           $allagentsstates_json=getrequest($interactionpath);
@@ -29,31 +29,31 @@
 
           if (count($allagentsstates["agents"])==2){
 
-            //$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid,$firstagent_id);
+            //$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid,$botid);
 
-            $firstagent_response_1="e(invest({$_POST["investoroffer"]}, {$secondagent_id}), _)";  
-            AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_investorside,$firstagent_id,$firstagent_response_1);
+            $firstagent_response_1="e(invest({$_POST["investoroffer"]}, {$playerid}), _)";  
+            AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_investorside,$botid,$firstagent_response_1);
             sleep(1);
 
-            msgstorecsv("{$interactionid_investorside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(invest({$_POST["investoroffer"]}#{$secondagent_id}))","{$sourcefiledir}/gamemsgs.csv");
-            mysql_insertmsgdata("{$interactionid_investorside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(invest({$_POST["investoroffer"]}#{$secondagent_id}))");
+            csv_storegamemsg("{$interactionid_investorside}","{$gameprotocol_id}","{$botid}","{$firstagent_role}","{$playerid}","{$secondagent_role}","e(invest({$_POST["investoroffer"]}#{$playerid}))","{$sourcefiledir}/gamemsgs.csv");
+            mysql_insertmsgdata("{$interactionid_investorside}","{$gameprotocol_id}","{$botid}","{$firstagent_role}","{$playerid}","{$secondagent_role}","e(invest({$_POST["investoroffer"]}#{$playerid}))");
 
-            //$secondagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_investorside,$secondagent_id);
+            //$secondagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_investorside,$playerid);
 
             $trusteerepay=gettrusteerepay($_POST["investoroffer"],$game_rate);
-            $secondagent_response_1="e(repay({$trusteerepay}, {$firstagent_id}), _)";
-            AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_investorside,$secondagent_id,$secondagent_response_1);
+            $secondagent_response_1="e(repay({$trusteerepay}, {$botid}), _)";
+            AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_investorside,$playerid,$secondagent_response_1);
             sleep(1);
             
-            msgstorecsv("{$interactionid_investorside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(repay({$trusteerepay}#{$firstagent_id}))","{$sourcefiledir}/gamemsgs.csv");
-            mysql_insertmsgdata("{$interactionid_investorside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(repay({$trusteerepay}#{$firstagent_id}))");
+            csv_storegamemsg("{$interactionid_investorside}","{$gameprotocol_id}","{$playerid}","{$secondagent_role}","{$botid}","{$firstagent_role}","e(repay({$trusteerepay}#{$botid}))","{$sourcefiledir}/gamemsgs.csv");
+            mysql_insertmsgdata("{$interactionid_investorside}","{$gameprotocol_id}","{$playerid}","{$secondagent_role}","{$botid}","{$firstagent_role}","e(repay({$trusteerepay}#{$botid}))");
 
             //store player info
             $playerinfo_pid=$playerid;
             $playerinfo_prole=$firstagent_role;
             $playerinfo_interid=$interactionid_investorside;
             $playerinfo_filedir="{$sourcefiledir}/playerinfo.csv";
-            store_playerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
+            csv_storeplayerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
             mysql_insertplayerinfodata("{$playerinfo_interid}","{$playerinfo_pid}","{$playerinfo_prole}");
 
             echo "The trustee has decided to repay £{$trusteerepay} to you.<br><br>";

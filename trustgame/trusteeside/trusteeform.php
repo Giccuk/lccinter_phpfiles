@@ -27,7 +27,7 @@
         AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_trusteeside,$firstagent_id,$firstagent_response_1);
         sleep(1);  
         
-        msgstorecsv("{$interactionid_trusteeside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(invest({$investoroffer_now}#{$secondagent_id}))","{$sourcefiledir}/gamemsgs.csv");
+        csv_storegamemsg("{$interactionid_trusteeside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(invest({$investoroffer_now}#{$secondagent_id}))","{$sourcefiledir}/gamemsgs.csv");
         mysql_insertmsgdata("{$interactionid_trusteeside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(invest({$investoroffer_now}#{$secondagent_id}))");
         
         //store info value
@@ -70,7 +70,7 @@
           AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_trusteeside,$secondagent_id,$secondagent_response_1);
           sleep(1);
 
-          msgstorecsv("{$interactionid_trusteeside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(repay({$finalrepay}#{$firstagent_id}))","{$sourcefiledir}/gamemsgs.csv");
+          csv_storegamemsg("{$interactionid_trusteeside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(repay({$finalrepay}#{$firstagent_id}))","{$sourcefiledir}/gamemsgs.csv");
           mysql_insertmsgdata("{$interactionid_trusteeside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(repay({$finalrepay}#{$firstagent_id}))");
 
             //store player info
@@ -78,7 +78,7 @@
             $playerinfo_prole=$secondagent_role;
             $playerinfo_interid=$interactionid_trusteeside;
             $playerinfo_filedir="{$sourcefiledir}/playerinfo.csv";
-            store_playerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
+            csv_storeplayerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
             mysql_insertplayerinfodata("{$playerinfo_interid}","{$playerinfo_pid}","{$playerinfo_prole}");
 
           $finalrepay_int=intval($finalrepay);

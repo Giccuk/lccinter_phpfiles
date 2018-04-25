@@ -20,7 +20,9 @@
     $investoroption_rand=array_rand($investoroption);
     $investoroffer=$investoroption[$investoroption_rand];  
 
-    $playerid=14;
+    $playerid="p12";
+    $botid="bot1";
+
   //0.
   function getrequest($getpath){
     $curlrequest = curl_init();
@@ -115,7 +117,7 @@
       postrequest($answer_path,json_encode($answer_data));
   }
 //6.
-  function msgstorecsv($interid,$protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody,$csvfile){
+  function csv_storegamemsg($interid,$protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody,$csvfile){
       //$csv_header=array('msgsenderid','msgsenderrole','msgreceiverid','msgreceiverrole','msgbody');
     $inputdata=array($interid,$protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody);
     for ($x=0;$x<sizeof($inputdata);$x++){
@@ -130,7 +132,7 @@
   }
 
   //7.
-  function store_playerinfo($playerid,$playerrole,$interid,$storefiledir){
+  function csv_storeplayerinfo($playerid,$playerrole,$interid,$storefiledir){
     $inputdata=array($playerid,$playerrole,$interid);
     for ($x=0;$x<sizeof($inputdata);$x++){
       $inputdata[$x]=str_replace(',', '#', $inputdata[$x]);

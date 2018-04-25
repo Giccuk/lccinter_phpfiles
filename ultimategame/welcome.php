@@ -59,7 +59,7 @@
               AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$firstagent_id,$firstagent_response_1);
               sleep(1);
 
-              msgstorecsv("{$w+}","{$w+}","{$w+}","{$w+}","{$w+}","{$w+}","e(S+)","{$}");
+              csv_storegamemsg("{$w+}","{$w+}","{$w+}","{$w+}","{$w+}","{$w+}","e(S+)","{$}");
 
               //store interid 
               writeinfovalue($interactionid_responderside,"{$sourcefiledir}/resinfo.txt");

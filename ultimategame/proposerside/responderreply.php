@@ -13,86 +13,68 @@
 
     if (isset($_POST["proposeroffer"])&&!empty($_POST["proposeroffer"])){
 
-      /*------------- 1.Create institutions if current insti is "default"-------------------------------------------------------*/
-      $defaultstate_json=getrequest("http://{$lccengineaddress}/institutions");echo '<br><br>';
-      //sleep(1);
-      $defaultstate=json_decode($defaultstate_json,true);
-      $subject=$defaultstate["0"]["path"];
-      $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
-      preg_match($pattern,$subject,$matches);
-      if ($matches[1]=="default"){//server is ready
-        //echo "1. Create an institution<br><br>";
-        $institutionstate_json=CreateInstitution($lccengineaddress,$institutionname);
-        $institutionstate=json_decode($institutionstate_json,true);
-        $subject=$institutionstate["path"];
-        $pattern="/http:\/\/{$lccengineaddress}\/institution\/user\/manager\/(\w+)/";
-        preg_match($pattern,$subject,$matches);
-        preg_match($pattern,$subject,$matches);
-        if ($matches[1]==$institutionname){
-
-        }
-      }
         /*-----------2. Create first agent--------------------*/
         
-          $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);
-          $interactionid_proposerside=GetInteractionId($firstagent_state,$lccengineaddress,$institutionname); 
-          /*---------2.1 check if interaction is successfully created---------------*/
-          if ($interactionid_proposerside!=""){
-            $interactionpath="http://{$lccengineaddress}/interaction/user/manager/{$institutionname}/{$interactionid_proposerside}";
-            /*----------3. create second agent----------------*/
-            CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_proposerside,$secondagent_id,$secondagent_role);
+        $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$playerid,$firstagent_role);
+        $interactionid_proposerside=GetInteractionId($firstagent_state,$lccengineaddress,$institutionname); 
+
+        if ($interactionid_proposerside!=""){
+          /*---------2.2 check firstagent state---------------*/
+          $interactionpath="http://{$lccengineaddress}/interaction/user/manager/{$institutionname}/{$interactionid_proposerside}";
+          /*----------3. create second agent----------------*/
+          CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_proposerside,$botid,$secondagent_role);
+          sleep(1);
+          /*------------3.1 check if all agents are created ---------------*/
+          $allagentsstates_json=getrequest($interactionpath);
+          $allagentsstates=json_decode($allagentsstates_json,true);
+
+          if (count($allagentsstates["agents"])==2){
+
+            /*$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_proposerside,$$playerid);
+            echo (gettype($firstagent_nextstep_1)).'<br>';
+            echo ($firstagent_nextstep_1[0]);*/
+
+            $firstagent_response_1="e(offernum({$_POST["proposeroffer"]}, {$botid}), _)";  
+            AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_proposerside,$playerid,$firstagent_response_1);
             sleep(1);
-            /*------------3.1 check if all agents are created ---------------*/
-            $allagentsstates_json=getrequest($interactionpath);
-            $allagentsstates=json_decode($allagentsstates_json,true);
 
-            if (count($allagentsstates["agents"])==2){
+            //store data
+            
+            csv_storegamemsg("{$interactionid_proposerside}","{$gameprotocol_id}","{$playerid}","{$firstagent_role}","{$botid}","{$secondagent_role}","e(offernum({$_POST["proposeroffer"]}#{$botid}))","{$sourcefiledir}/gamemsgs.csv");
+            mysql_insertmsgdata("{$interactionid_proposerside}","{$gameprotocol_id}","{$playerid}","{$firstagent_role}","{$botid}","{$secondagent_role}","e(offernum({$_POST["proposeroffer"]}#{$botid}))");
 
-              /*$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_proposerside,$firstagent_id);
-              echo (gettype($firstagent_nextstep_1)).'<br>';
-              echo ($firstagent_nextstep_1[0]);*/
+            /*$secondagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_proposerside,$botid);
+            echo (gettype($secondagent_nextstep_1)).'<br>';
+            echo sizeof($secondagent_nextstep_1).'<br>';
+            echo ($secondagent_nextstep_1[0]);*/
 
-              $firstagent_response_1="e(offernum({$_POST["proposeroffer"]}, {$secondagent_id}), _)";  
-              AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_proposerside,$firstagent_id,$firstagent_response_1);
-              sleep(1);
+            $responderchoice_now=$responderchoice;
+            $secondagent_response_1="e(acceptornot({$responderchoice_now}, {$_POST["proposeroffer"]}), _)";
+            AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_proposerside,$botid,$secondagent_response_1);
+            sleep(1);
+            
+            //store data
+            csv_storegamemsg("{$interactionid_proposerside}","{$gameprotocol_id}","{$botid}","{$secondagent_role}","{$playerid}","{$firstagent_role}","e(acceptornot({$responderchoice_now}#{$_POST["proposeroffer"]}))","{$sourcefiledir}/gamemsgs.csv");
+            mysql_insertmsgdata("{$interactionid_proposerside}","{$gameprotocol_id}","{$botid}","{$secondagent_role}","{$playerid}","{$firstagent_role}","e(acceptornot({$responderchoice_now}#{$_POST["proposeroffer"]}))");
+            
+            //store player info
+            $playerinfo_pid=$playerid;
+            $playerinfo_prole=$firstagent_role;
+            $playerinfo_interid=$interactionid_proposerside;
+            $playerinfo_filedir="{$sourcefiledir}/playerinfo.csv";
+            csv_storeplayerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
+            mysql_insertplayerinfodata("{$playerinfo_interid}","{$playerinfo_pid}","{$playerinfo_prole}");
 
-              //store data
-              
-              msgstorecsv("{$interactionid_proposerside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(offernum({$_POST["proposeroffer"]}#{$secondagent_id}))","{$sourcefiledir}/gamemsgs.csv");
-              mysql_insertmsgdata("{$interactionid_proposerside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(offernum({$_POST["proposeroffer"]}#{$secondagent_id}))");
-
-              /*$secondagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_proposerside,$secondagent_id);
-              echo (gettype($secondagent_nextstep_1)).'<br>';
-              echo sizeof($secondagent_nextstep_1).'<br>';
-              echo ($secondagent_nextstep_1[0]);*/
-
-              $responderchoice_now=$responderchoice;
-              $secondagent_response_1="e(acceptornot({$responderchoice_now}, {$_POST["proposeroffer"]}), _)";
-              AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_proposerside,$secondagent_id,$secondagent_response_1);
-              sleep(1);
-              
-              //store data
-              msgstorecsv("{$interactionid_proposerside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(acceptornot({$responderchoice_now}#{$_POST["proposeroffer"]}))","{$sourcefiledir}/gamemsgs.csv");
-              mysql_insertmsgdata("{$interactionid_proposerside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(acceptornot({$responderchoice_now}#{$_POST["proposeroffer"]}))");
-              
-              //store player info
-              $playerinfo_pid=$playerid;
-              $playerinfo_prole=$firstagent_role;
-              $playerinfo_interid=$interactionid_proposerside;
-              $playerinfo_filedir="{$sourcefiledir}/playerinfo.csv";
-              store_playerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
-              mysql_insertplayerinfodata("{$playerinfo_interid}","{$playerinfo_pid}","{$playerinfo_prole}");
-
-              //var_dump($secondagent_response_1); echo"<br><br>";
-              echo "The responder has decided to {$responderchoice_now} your offer.<br><br>";
-            }
-            else{
-              echo "Failed to create the second agent. *_*<br><br>";
-            }
+            //var_dump($secondagent_response_1); echo"<br><br>";
+            echo "The responder has decided to {$responderchoice_now} your offer.<br><br>";
           }
           else{
-            echo "Failed to create new interaction. *_* <br><br>";
+            echo "Failed to create the second agent. *_*<br><br>";
           }
+        }
+        else{
+          echo "Failed to create new interaction. *_* <br><br>";
+        }
     }
   }
 ?>

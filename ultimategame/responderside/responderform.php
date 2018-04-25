@@ -9,23 +9,23 @@
   include "../ulticontrol/ultimategameinfo.php"; 
 
   if ($_SERVER["REQUEST_METHOD"] != "POST"){
-    $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$firstagent_id,$firstagent_role);//create first agent 
+    $firstagent_state=CreateFirstagent($lccengineaddress,$institutionname,$gameprotocol_id,$botid,$firstagent_role);//create first agent 
     $interactionid_responderside=GetInteractionId($firstagent_state,$lccengineaddress,$institutionname);
     if ($interactionid_responderside!=""){//firstagent has been created successfully
         $interactionpath="http://{$lccengineaddress}/interaction/user/manager/{$institutionname}/{$interactionid_responderside}";
-        CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_responderside,$secondagent_id,$secondagent_role);//create second agent
+        CreateOtherAgent($lccengineaddress,$institutionname,$interactionid_responderside,$playerid,$secondagent_role);//create second agent
         sleep(1);
         $allagentsstates_json=getrequest($interactionpath);
         $allagentsstates=json_decode($allagentsstates_json,true);
         if (count($allagentsstates["agents"])==2){//all two agents have been created successfully
-        //$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$firstagent_id);
+        //$firstagent_nextstep_1=AskAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$botid);
           $proposeroffer_now=$proposeroffer;
-          $firstagent_response_1="e(offernum({$proposeroffer_now}, richard), _)";  
-          AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$firstagent_id,$firstagent_response_1);
+          $firstagent_response_1="e(offernum({$proposeroffer_now}, {$playerid}), _)";  
+          AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$botid,$firstagent_response_1);
           sleep(1);
 
-          msgstorecsv("{$interactionid_responderside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(offernum({$proposeroffer_now}#{$secondagent_id}))","{$sourcefiledir}/gamemsgs.csv");
-          mysql_insertmsgdata("{$interactionid_responderside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(offernum({$proposeroffer_now}#{$secondagent_id}))");
+          csv_storegamemsg("{$interactionid_responderside}","{$gameprotocol_id}","{$botid}","{$firstagent_role}","{$playerid}","{$secondagent_role}","e(offernum({$proposeroffer_now}#{$playerid}))","{$sourcefiledir}/gamemsgs.csv");
+          mysql_insertmsgdata("{$interactionid_responderside}","{$gameprotocol_id}","{$botid}","{$firstagent_role}","{$playerid}","{$secondagent_role}","e(offernum({$proposeroffer_now}#{$playerid}))");
 
           //store interid 
           #writeinfovalue($interactionid_responderside,$proposeroffer_now,"{$sourcefiledir}/resinfo.txt");
@@ -54,18 +54,18 @@
           $proposeroffer_now=$matches[3];
           
           $secondagent_response_1="e(acceptornot({$responderchoice_now}, {$proposeroffer_now}), _)";
-          AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$secondagent_id,$secondagent_response_1);
+          AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$playerid,$secondagent_response_1);
           sleep(1);
 
-          msgstorecsv("{$interactionid_responderside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(acceptornot({$responderchoice_now}#{$proposeroffer_now}))","{$sourcefiledir}/gamemsgs.csv");
-          mysql_insertmsgdata("{$interactionid_responderside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(acceptornot({$responderchoice_now}#{$proposeroffer_now}))");
+          csv_storegamemsg("{$interactionid_responderside}","{$gameprotocol_id}","{$playerid}","{$secondagent_role}","{$botid}","{$firstagent_role}","e(acceptornot({$responderchoice_now}#{$proposeroffer_now}))","{$sourcefiledir}/gamemsgs.csv");
+          mysql_insertmsgdata("{$interactionid_responderside}","{$gameprotocol_id}","{$playerid}","{$secondagent_role}","{$botid}","{$firstagent_role}","e(acceptornot({$responderchoice_now}#{$proposeroffer_now}))");
           
           //store player info
           $playerinfo_pid=$playerid;
           $playerinfo_prole=$secondagent_role;
           $playerinfo_interid=$interactionid_responderside;
           $playerinfo_filedir="{$sourcefiledir}/playerinfo.csv";
-          store_playerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
+          csv_storeplayerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
           mysql_insertplayerinfodata("{$playerinfo_interid}","{$playerinfo_pid}","{$playerinfo_prole}");
 
           if ($responderchoice_now=="accept"){
@@ -100,11 +100,11 @@
     else{
       if (isset($_POST["responderchoice"])&&!empty($_POST["responderchoice"])){
         $secondagent_response_1="e(acceptornot({$_POST["responderchoice"]}, {$proposeroffer_now}), _)";
-        AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$secondagent_id,$secondagent_response_1);
+        AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_responderside,$playerid,$secondagent_response_1);
         
         sleep(1);
 
-        msgstorecsv("{$interactionid_responderside}","{$gameprotocol_id}","{$secondagent_id}","{$secondagent_role}","{$firstagent_id}","{$firstagent_role}","e(acceptornot({$_POST["responderchoice"]}#{$proposeroffer_now}))");
+        csv_storegamemsg("{$interactionid_responderside}","{$gameprotocol_id}","{$playerid}","{$secondagent_role}","{$botid}","{$firstagent_role}","e(acceptornot({$_POST["responderchoice"]}#{$proposeroffer_now}))");
         
         echo "+++++++++<br>{$interactionid_responderside}<br>===============";      
         //echo "You just ".$_POST["responderchoice"]." the proposer's offer.";

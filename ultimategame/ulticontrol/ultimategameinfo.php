@@ -22,7 +22,8 @@
     $randresponderoption=array_rand($responderoption);
     $responderchoice=$responderoption[$randresponderoption];
 
-    $playerid=14;
+    $playerid="p12";
+    $botid="bot1";
 
   //0.2
   function getrequest($getpath){
@@ -120,7 +121,7 @@
 
 
 //6.
-  function msgstorecsv($interid,$protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody,$csvfile){
+  function csv_storegamemsg($interid,$protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody,$csvfile){
       //$csv_header=array('msgsenderid','msgsenderrole','msgreceiverid','msgreceiverrole','msgbody');
     $inputdata=array($interid,$protocolid,$msgsenderid,$msgsenderrole,$msgreceiverid,$msgreceiverrole,$msgbody);
     for ($x=0;$x<sizeof($inputdata);$x++){
@@ -135,7 +136,7 @@
   }
 
   //7.
-  function store_playerinfo($playerid,$playerrole,$interid,$storefiledir){
+  function csv_storeplayerinfo($playerid,$playerrole,$interid,$storefiledir){
     $inputdata=array($playerid,$playerrole,$interid);
     for ($x=0;$x<sizeof($inputdata);$x++){
       $inputdata[$x]=str_replace(',', '#', $inputdata[$x]);
@@ -157,14 +158,15 @@
       $dbname = "lccgame";
       $tablename="gamemsgs";
 
-      $pattern="/int(\d+)/";
-      $subject=$interid;
-      preg_match($pattern,$subject,$matches);
-      $interid_int=(int)$matches[1];
+      #$pattern="/int(\d+)/";
+      #$subject=$interid;
+      #preg_match($pattern,$subject,$matches);
+      #$interid_int=(int)$matches[1];
 
       $sql_exist="select * from {$tablename}";
-      $sql_createdb="CREATE TABLE {$tablename} (gameid INT(11) AUTO_INCREMENT, interid INT(11),protocolid VARCHAR(255) , msgsenderid VARCHAR(255) , msgsenderrole VARCHAR(255) , msgreceiverid VARCHAR(255) , msgreceiverrole VARCHAR(255), msgbody VARCHAR(255),PRIMARY KEY(gameid))";
-      $sql_insert="INSERT INTO {$tablename} (interid, protocolid, msgsenderid, msgsenderrole, msgreceiverid, msgreceiverrole, msgbody) VALUES ('{$interid_int}', '{$protocolid}', '{$msgsenderid}', '{$msgsenderrole}', '{$msgreceiverid}', '{$msgreceiverrole}', '{$msgbody}')";
+      $sql_createdb="CREATE TABLE {$tablename} (gameid INT(11) AUTO_INCREMENT, interid text,protocolid text , msgsenderid text , msgsenderrole text, msgreceiverid text, msgreceiverrole text, msgbody text,PRIMARY KEY(gameid))";
+      #$sql_insert="INSERT INTO {$tablename} (interid, protocolid, msgsenderid, msgsenderrole, msgreceiverid, msgreceiverrole, msgbody) VALUES ('{$interid_int}', '{$protocolid}', '{$msgsenderid}', '{$msgsenderrole}', '{$msgreceiverid}', '{$msgreceiverrole}', '{$msgbody}')";
+      $sql_insert="INSERT INTO {$tablename} (interid, protocolid, msgsenderid, msgsenderrole, msgreceiverid, msgreceiverrole, msgbody) VALUES ('{$interid}', '{$protocolid}', '{$msgsenderid}', '{$msgsenderrole}', '{$msgreceiverid}', '{$msgreceiverrole}', '{$msgbody}')";
 
       $conn = new mysqli($servername, $username, $password, $dbname);
       if ($conn->query($sql_exist)){
@@ -188,16 +190,17 @@
       $dbname = "lccgame";
       $tablename="playerinfo";
 
-      $pattern="/int(\d+)/";
-      $subject=$interid;
-      preg_match($pattern,$subject,$matches);
-      $interid_int=(int)$matches[1];
+      #$pattern="/int(\d+)/";
+      #$subject=$interid;
+      #preg_match($pattern,$subject,$matches);
+      #$interid_int=(int)$matches[1];
 
-      $userid_int=(int)$userid;
+      #$userid_int=(int)$userid;
 
       $sql_exist="select * from {$tablename}";
-      $sql_createtable="CREATE TABLE {$tablename} ( gameid INT(11) NOT NULL AUTO_INCREMENT,interid INT(11), userid INT(11), playerrole VARCHAR(255),PRIMARY KEY(gameid))";
-      $sql_insert="INSERT INTO {$tablename} (interid, userid, playerrole ) VALUES ('{$interid_int}','{$userid}', '{$playerrole}')";
+      $sql_createtable="CREATE TABLE {$tablename} ( gameid INT(11) NOT NULL AUTO_INCREMENT,interid text, userid text, playerrole text,PRIMARY KEY(gameid))";
+      #$sql_insert="INSERT INTO {$tablename} (interid, userid, playerrole ) VALUES ('{$interid_int}','{$userid}', '{$playerrole}')";
+      $sql_insert="INSERT INTO {$tablename} (interid, userid, playerrole ) VALUES ('{$interid}','{$userid}', '{$playerrole}')";
 
       $conn = new mysqli($servername, $username, $password, $dbname);
       if ($conn->query($sql_exist)){

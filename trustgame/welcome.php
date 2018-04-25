@@ -62,7 +62,7 @@
               AnswerAgentNextStep($lccengineaddress,$institutionname,$interactionid_Trusteeside,$firstagent_id,$firstagent_response_1);
               sleep(1);  
 
-              msgstorecsv("{$interactionid_Trusteeside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(invest({$investoroffer_now}#{$secondagent_id}))");
+              csv_storegamemsg("{$interactionid_Trusteeside}","{$gameprotocol_id}","{$firstagent_id}","{$firstagent_role}","{$secondagent_id}","{$secondagent_role}","e(invest({$investoroffer_now}#{$secondagent_id}))");
 
               //pass interactionid to trusteeside
               $keydata=array("interid"=>$interactionid_Trusteeside,"investorchoice"=>$investoroffer_now);
