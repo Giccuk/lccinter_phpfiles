@@ -155,22 +155,25 @@
     return $trusteerepay;
   }
 
+  //10.
   function mysql_insertmsgdata($interid,$protocolid,$msgsenderid, $msgsenderrole,$msgreceiverid,$msgreceiverrole, $msgbody){
 
       $servername = "localhost:3306";
       $username = "host";
       $password = "host";
       $dbname = "lccgame";
-      $tablename="gamemsgs";
+      #$tablename="gamemsgs";
+      $tablename="gamemsgs2";
 
-      $pattern="/int(\d+)/";
-      $subject=$interid;
-      preg_match($pattern,$subject,$matches);
-      $interid_int=(int)$matches[1];
+      #$pattern="/int(\d+)/";
+      #$subject=$interid;
+      #preg_match($pattern,$subject,$matches);
+      #$interid_int=(int)$matches[1];
 
       $sql_exist="select * from {$tablename}";
-      $sql_createdb="CREATE TABLE {$tablename} (gameid INT(11) AUTO_INCREMENT, interid INT(11),protocolid VARCHAR(255) , msgsenderid VARCHAR(255) , msgsenderrole VARCHAR(255) , msgreceiverid VARCHAR(255) , msgreceiverrole VARCHAR(255), msgbody VARCHAR(255),PRIMARY KEY(gameid))";
-      $sql_insert="INSERT INTO {$tablename} (interid, protocolid, msgsenderid, msgsenderrole, msgreceiverid, msgreceiverrole, msgbody) VALUES ('{$interid_int}', '{$protocolid}', '{$msgsenderid}', '{$msgsenderrole}', '{$msgreceiverid}', '{$msgreceiverrole}', '{$msgbody}')";
+      $sql_createdb="CREATE TABLE {$tablename} (gameid INT(11) AUTO_INCREMENT, interid text,protocolid text , msgsenderid text , msgsenderrole text, msgreceiverid text, msgreceiverrole text, msgbody text,PRIMARY KEY(gameid))";
+      #$sql_insert="INSERT INTO {$tablename} (interid, protocolid, msgsenderid, msgsenderrole, msgreceiverid, msgreceiverrole, msgbody) VALUES ('{$interid_int}', '{$protocolid}', '{$msgsenderid}', '{$msgsenderrole}', '{$msgreceiverid}', '{$msgreceiverrole}', '{$msgbody}')";
+      $sql_insert="INSERT INTO {$tablename} (interid, protocolid, msgsenderid, msgsenderrole, msgreceiverid, msgreceiverrole, msgbody) VALUES ('{$interid}', '{$protocolid}', '{$msgsenderid}', '{$msgsenderrole}', '{$msgreceiverid}', '{$msgreceiverrole}', '{$msgbody}')";
 
       $conn = new mysqli($servername, $username, $password, $dbname);
       if ($conn->query($sql_exist)){
@@ -185,25 +188,27 @@
       $conn->close();
   }
 
-//10.
+//11.
   function mysql_insertplayerinfodata($interid,$userid,$playerrole){
 
       $servername = "localhost:3306";
       $username = "host";
       $password = "host";
       $dbname = "lccgame";
-      $tablename="playerinfo";
+      #$tablename="playerinfo2";
+      $tablename="playerinfo2";
 
-      $pattern="/int(\d+)/";
-      $subject=$interid;
-      preg_match($pattern,$subject,$matches);
-      $interid_int=(int)$matches[1];
+      #$pattern="/int(\d+)/";
+      #$subject=$interid;
+      #preg_match($pattern,$subject,$matches);
+      #$interid_int=(int)$matches[1];
 
-      $userid_int=(int)$userid;
+      #$userid_int=(int)$userid;
 
       $sql_exist="select * from {$tablename}";
-      $sql_createtable="CREATE TABLE {$tablename} ( gameid INT(11) NOT NULL AUTO_INCREMENT,interid INT(11), userid INT(11), playerrole VARCHAR(255),PRIMARY KEY(gameid))";
-      $sql_insert="INSERT INTO {$tablename} (interid, userid, playerrole ) VALUES ('{$interid_int}','{$userid}', '{$playerrole}')";
+      $sql_createtable="CREATE TABLE {$tablename} ( gameid INT(11) NOT NULL AUTO_INCREMENT,interid text, userid text, playerrole text,PRIMARY KEY(gameid))";
+      #$sql_insert="INSERT INTO {$tablename} (interid, userid, playerrole ) VALUES ('{$interid_int}','{$userid}', '{$playerrole}')";
+      $sql_insert="INSERT INTO {$tablename} (interid, userid, playerrole ) VALUES ('{$interid}','{$userid}', '{$playerrole}')";
 
       $conn = new mysqli($servername, $username, $password, $dbname);
       if ($conn->query($sql_exist)){
