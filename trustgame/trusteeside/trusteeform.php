@@ -78,8 +78,8 @@
             $playerinfo_prole=$secondagent_role;
             $playerinfo_interid=$interactionid_trusteeside;
             $playerinfo_filedir="{$sourcefiledir}/playerinfo.csv";
-            csv_storeplayerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
-            mysql_insertplayerinfodata("{$playerinfo_interid}","{$playerinfo_pid}","{$playerinfo_prole}");
+            csv_storeplayerinfo("{$playerinfo_pid}","{$playerinfo_prole}#{$gameprotocol_id}","{$playerinfo_interid}","{$playerinfo_filedir}");
+            mysql_insertplayerinfodata("{$playerinfo_interid}","{$playerinfo_pid}","{$playerinfo_prole}#{$gameprotocol_id}");
 
           $finalrepay_int=intval($finalrepay);
           $finalrepay_binary=decbin($finalrepay_int);

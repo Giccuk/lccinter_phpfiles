@@ -62,8 +62,8 @@
             $playerinfo_prole=$firstagent_role;
             $playerinfo_interid=$interactionid_proposerside;
             $playerinfo_filedir="{$sourcefiledir}/playerinfo.csv";
-            csv_storeplayerinfo("{$playerinfo_pid}","{$playerinfo_prole}","{$playerinfo_interid}","{$playerinfo_filedir}");
-            mysql_insertplayerinfodata("{$playerinfo_interid}","{$playerinfo_pid}","{$playerinfo_prole}");
+            csv_storeplayerinfo("{$playerinfo_pid}","{$playerinfo_prole}#{$gameprotocol_id}","{$playerinfo_interid}","{$playerinfo_filedir}");
+            mysql_insertplayerinfodata("{$playerinfo_interid}","{$playerinfo_pid}","{$playerinfo_prole}#{$gameprotocol_id}");
 
             //var_dump($secondagent_response_1); echo"<br><br>";
             echo "The responder has decided to {$responderchoice_now} your offer.<br><br>";

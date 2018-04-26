@@ -246,3 +246,4 @@ p12,proposer(10),int8512
 p12,responder(10),int9730
 p12,investor(10#3),int7770
 p12,trustee(3),int7254
+p12,investor(10#3)#trustgame_simple,int8083

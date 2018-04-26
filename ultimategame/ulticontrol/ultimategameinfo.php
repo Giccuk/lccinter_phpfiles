@@ -157,7 +157,7 @@
       $password = "host";
       $dbname = "lccgame";
       #$tablename="gamemsgs";
-      $tablename="gamemsgs2";
+      $tablename="gamemsgs";
 
       #$pattern="/int(\d+)/";
       #$subject=$interid;
@@ -189,8 +189,8 @@
       $username = "host";
       $password = "host";
       $dbname = "lccgame";
-      #$tablename="playerinfo2";
-      $tablename="playerinfo2";
+      #$tablename="playerinfo";
+      $tablename="playerinfo";
 
       #$pattern="/int(\d+)/";
       #$subject=$interid;
